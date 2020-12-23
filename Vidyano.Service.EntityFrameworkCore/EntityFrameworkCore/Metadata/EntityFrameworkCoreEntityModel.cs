@@ -62,7 +62,8 @@ namespace Vidyano.Service.EntityFrameworkCore.Metadata
             using var localScope = ServiceLocator.GetScopedRequiredService(contextType, out var service);
             var dbContext = (DbContext)service!;
 
-            var query = "if (object_id('dbo.PostSynchronize', 'P') is not null) begin exec dbo.PostSynchronize insert into Vidyano.CacheUpdates (Id, Timestamp, Data) values(newid(), sysdatetimeoffset(), cast('' as varbinary(max))) select 1 end else select 0";
+            //TODO
+            var query = "DO $_$ BEGIN BEGIN PERFORM public.\"PostSynchronize\"(); insert into \"Vidyano\".\"CacheUpdates\" (\"Id\", \"Timestamp\", \"Data\") values(uuid_generate_v4(), NOW(), ''); EXCEPTION WHEN undefined_function then END; END $_$;";
 
             return dbContext.Database.ExecuteSqlRaw(query) == 1; // TODO: Does not return correct number
         }

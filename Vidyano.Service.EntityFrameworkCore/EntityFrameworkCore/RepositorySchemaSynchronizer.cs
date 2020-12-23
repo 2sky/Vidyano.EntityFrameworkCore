@@ -52,7 +52,7 @@ namespace Vidyano.Service.EntityFrameworkCore
             if (currentVersion < 45)
                 throw new InvalidOperationException("Repository is too old, expecting at least 45, got " + currentVersion);
 
-            ExecuteSql("delete from [Vidyano].[CacheUpdates]");
+            ExecuteSql("delete from \"Vidyano\".\"CacheUpdates\"");
 
             while (currentVersion < Version)
             {
