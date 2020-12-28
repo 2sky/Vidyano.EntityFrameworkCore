@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Npgsql;
 using Vidyano.Core.Extensions;
 using Vidyano.Core.Services;
 using Vidyano.Service.Repository;
@@ -329,13 +330,13 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         /// <inheritdoc />
         public virtual void AppendLog(Guid id, string message)
         {
-            Database.ExecuteSqlRaw("UPDATE [" + schemaName + "].[Logs]\nSET [Message] = [Message] + @p0\nWHERE ([ExternalId] = @p1)", message, id);
+            Database.ExecuteSqlRaw("UPDATE \"" + schemaName + "\".\"Logs\"\nSET \"Message]\"= \"Message\" + @p0\nWHERE (\"ExternalId\" = @p1)", message, id);
         }
 
         /// <inheritdoc />
         public virtual void PrependLog(Guid id, string message)
         {
-            Database.ExecuteSqlRaw("UPDATE [" + schemaName + "].[Logs]\nSET [Message] = @p0 + [Message]\nWHERE ([ExternalId] = @p1)", message, id);
+            Database.ExecuteSqlRaw("UPDATE \"" + schemaName + "\".\"Logs\"\nSET \"Message\" = @p0 + \"Message\"\nWHERE (\"ExternalId\" = @p1)", message, id);
         }
 
         /// <inheritdoc />
@@ -356,7 +357,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         /// <inheritdoc />
         public virtual void CleanupLogs(int days)
         {
-            Retry.Do(() => Database.ExecuteSqlRaw("delete from [Vidyano].[Logs] where [Type] <> 1 and [CreatedOn] < dateadd(d, @days, sysdatetimeoffset())", new SqlParameter("days", -days)));
+            Retry.Do(() => Database.ExecuteSqlRaw("delete from \"Vidyano\".\"Logs\" where \"Type\" <> 1 and \"CreatedOn\" < CURRENT_DATE - @days * INTERVAL '1 day';", new NpgsqlParameter("days", days)));
         }
 
         /// <inheritdoc />

@@ -14,7 +14,7 @@ namespace Vidyano.Service.EntityFrameworkCore
 
             services.AddDbContext<DefaultRepositoryProvider>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("Vidyano"));
+                options.UseNpgsql(configuration.GetConnectionString("Vidyano"));
             });
 
             services.AddSingleton<ProviderSpecificService, EntityFrameworkCoreSpecificService>();
