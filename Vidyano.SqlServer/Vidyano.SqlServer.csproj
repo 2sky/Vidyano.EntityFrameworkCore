@@ -4,38 +4,32 @@
   </PropertyGroup>
   <PropertyGroup>
     <IsPackable>true</IsPackable>
-    <PackageId>Vidyano.Service.EntityFrameworkCore</PackageId>
+    <PackageId>Vidyano.SqlServer</PackageId>
     <Version>6.0.20201217.2654-rc1</Version>
     <AssemblyVersion>6.0.0.0</AssemblyVersion>
     <FileVersion>6.0.0.0</FileVersion>
     <Company>2sky NV</Company>
     <Authors>2sky NV</Authors>
     <Description>Vidyano is a full featured development platform with the flexibility for creating small to enterprise scale web applications.</Description>
-    <Copyright>Copyright © 2010-2020 2sky NV</Copyright>
-    <Tags>vidyano service backend EntityFrameworkCore</Tags>
+    <Copyright>Copyright © 2010-2021 2sky NV</Copyright>
+    <Tags>vidyano service backend EntityFrameworkCore SqlServer</Tags>
     <PackageProjectUrl>https://www.vidyano.com/</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <RootNamespace>Vidyano.Service</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Vidyano.Service.EntityFrameworkCore.sln.DotSettings" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Gapotchenko.Eazfuscator.NET" Version="2020.3.316">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <None Remove="Vidyano.SqlServer.csproj.DotSettings" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.11" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Vidyano.Service" Version="6.0.20201217.2654-rc1" />

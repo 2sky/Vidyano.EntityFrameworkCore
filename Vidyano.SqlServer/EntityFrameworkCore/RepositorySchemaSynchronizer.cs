@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Vidyano.Service.EntityFrameworkCore
 {
     [Obfuscation(Feature = "renaming")]
-    sealed class RepositorySchemaSynchronizer
+    internal sealed class RepositorySchemaSynchronizer
     {
         #region Fields
 
@@ -52,7 +52,7 @@ namespace Vidyano.Service.EntityFrameworkCore
             if (currentVersion < 45)
                 throw new InvalidOperationException("Repository is too old, expecting at least 45, got " + currentVersion);
 
-            ExecuteSql("delete from [Vidyano].[CacheUpdates]");
+            seedContext.Database.ExecuteSqlRaw(SqlStatements.DeleteFromCacheUpdates);
 
             while (currentVersion < Version)
             {
@@ -69,11 +69,6 @@ namespace Vidyano.Service.EntityFrameworkCore
 
         #region Private Methods
 
-        private void ExecuteSql(string sql)
-        {
-            seedContext.Database.ExecuteSqlRaw(sql);
-        }
-
         private void UpdateToV61()
         {
             // Vidyano.Upgrade tool will update to V61
@@ -86,7 +81,7 @@ namespace Vidyano.Service.EntityFrameworkCore
          * NOTE: SQL Scripts need to be forward compatible:
          * - New tables are okay (references should use cascade delete)
          * - New columns should be null or have a default constraint
-         * - Limitations should be gracefull (e.g. maxlength, ...)
+         * - Limitations should be graceful (e.g. maxlength, ...)
          * - DO NOT rename columns or drop tables
          */
 

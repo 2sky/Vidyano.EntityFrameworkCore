@@ -32,8 +32,6 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
 
                         seedContext.SaveChanges();
 
-                        seedContext.Database.ExecuteSqlRaw("if OBJECT_ID('Vidyano.Initialize', 'U') is not null drop table [Vidyano].[Initialize]");
-
                         hasChanges = true;
 
                         transaction.Commit();

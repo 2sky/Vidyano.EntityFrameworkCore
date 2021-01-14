@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Vidyano.Core.Extensions;
@@ -30,8 +29,6 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
 
         private static readonly long baseTicks = new DateTime(2000, 1, 1).Ticks;
         private bool skipUpdateVidyanoCache;
-
-        private const string schemaName = "Vidyano";
 
         /// <summary>
         /// Creates a new instance of the <see cref="DefaultRepositoryProvider"/> class using the default Vidyano connection string.
@@ -105,39 +102,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         internal DbSet<UserSettings> UserSettings { get; set; }
 
         /// <inheritdoc />
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Non-tracked entities
-            modelBuilder.Entity<CacheUpdateDto>().ToTable(nameof(CacheUpdates), schemaName)
-                .Property(cu => cu.Timestamp).ValueGeneratedOnAddOrUpdate();
-            modelBuilder.Entity<RegisteredStreamDto>().ToTable(nameof(RegisteredStreams), schemaName)
-                .Ignore(rs => rs.UserId);
-            var feedback = modelBuilder.Entity<FeedbackDto>().ToTable(nameof(Feedbacks), schemaName);
-            feedback.Property(f => f.CreatedOn).HasColumnType("datetimeoffset(3)");
-            var log = modelBuilder.Entity<LogDto>().ToTable(nameof(Logs), schemaName);
-            log.Property<long>("DbId").HasColumnName("Id").UseIdentityColumn();
-            log.Property(l => l.Id).HasColumnName("ExternalId");
-            log.Property(l => l.CreatedOn).HasColumnType("datetimeoffset(3)");
-
-            // Tracked entities
-            modelBuilder.Entity<SettingDto>().ToTable(nameof(Settings), schemaName);
-            modelBuilder.Entity<UserNotificationDto>().ToTable(nameof(UserNotifications), schemaName);
-            modelBuilder.Entity<UserProfile>().ToTable(nameof(UserProfiles), schemaName);
-            modelBuilder.Entity<UserSettings>().ToTable(nameof(UserSettings), schemaName);
-
-            var user = modelBuilder.Entity<UserDto>().ToTable(nameof(Users), schemaName);
-            user.Property(u => u.Language).IsUnicode(false);
-            user.Property(u => u.CultureInfo).IsUnicode(false);
-            user.Property(u => u.Version).IsUnicode(false);
-            user.Property(u => u.TwoFactorToken).IsUnicode(false);
-            user.Property(u => u.CreationDate).HasColumnType("datetimeoffset(3)");
-            user.Property(u => u.LastLoginDate).HasColumnType("datetimeoffset(3)");
-            var group = modelBuilder.Entity<GroupDto>().ToTable(nameof(Groups), schemaName);
-            group.Property(g => g.CreationDate).HasColumnType("datetimeoffset(3)");
-            //modelBuilder.Entity<UserNotification>().ToTable("UserNotifications", schemaName);
-            modelBuilder.Entity<UserGroup>().ToTable("UserGroup", schemaName)
-                .HasKey(ug => new { ug.Users_Id, ug.Groups_Id });
-        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) => SqlStatements.OnModelCreating(modelBuilder);
 
         /// <inheritdoc />
         public virtual void Initialize(InitializeArgs args)
@@ -193,7 +158,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         {
             ApplicationIntentDeterminer.CheckRepositoryReadOnly();
 
-            Retry.Do(() => Database.ExecuteSqlRaw("delete from [" + schemaName + "].[RegisteredStreams] where [ValidUntil] < sysdatetimeoffset()"));
+            Retry.Do(() => Database.ExecuteSqlRaw(SqlStatements.DeleteFromRegisteredStreams));
             var utcNow = DateTimeOffset.UtcNow;
             ChangeTracker
                 .Entries<RegisteredStreamDto>()
@@ -225,7 +190,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         }
 
         /// <inheritdoc />
-        public virtual IFeedbackDto GetFeedback(string objectId)
+        public virtual IFeedbackDto? GetFeedback(string objectId)
         {
             var id = objectId.FromServiceString<Guid>();
             return Feedbacks
@@ -258,7 +223,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         {
             var log = new LogDto();
             log.Id = CreateSequentialGuid();
-            log.CreatedOn = (DateTimeOffset)DataTypes.GetDefaultValue(typeof(DateTimeOffset), DataTypes.DateTimeOffset);
+            log.CreatedOn = (DateTimeOffset)DataTypes.GetDefaultValue(typeof(DateTimeOffset), DataTypes.DateTimeOffset)!;
             user ??= Manager.Current?.User;
             if (user != null)
                 log.UserId = user.Id;
@@ -329,13 +294,13 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         /// <inheritdoc />
         public virtual void AppendLog(Guid id, string message)
         {
-            Database.ExecuteSqlRaw("UPDATE [" + schemaName + "].[Logs]\nSET [Message] = [Message] + @p0\nWHERE ([ExternalId] = @p1)", message, id);
+            Database.ExecuteSqlInterpolated(SqlStatements.AppendLog(id, message));
         }
 
         /// <inheritdoc />
         public virtual void PrependLog(Guid id, string message)
         {
-            Database.ExecuteSqlRaw("UPDATE [" + schemaName + "].[Logs]\nSET [Message] = @p0 + [Message]\nWHERE ([ExternalId] = @p1)", message, id);
+            Database.ExecuteSqlInterpolated(SqlStatements.PrependLog(id, message));
         }
 
         /// <inheritdoc />
@@ -356,7 +321,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         /// <inheritdoc />
         public virtual void CleanupLogs(int days)
         {
-            Retry.Do(() => Database.ExecuteSqlRaw("delete from [Vidyano].[Logs] where [Type] <> 1 and [CreatedOn] < dateadd(d, @days, sysdatetimeoffset())", new SqlParameter("days", -days)));
+            Retry.Do(() => Database.ExecuteSqlInterpolated(SqlStatements.CleanupLogs(-days)));
         }
 
         /// <inheritdoc />

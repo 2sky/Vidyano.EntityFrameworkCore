@@ -1,14 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Vidyano.Service.Charts;
+using Vidyano.Service.EntityFrameworkCore;
 using Vidyano.Service.EntityFrameworkCore.Dto;
 
-namespace Vidyano.Service.EntityFrameworkCore
+namespace Vidyano.Service.SqlServer
 {
-    public static class VidyanoEntityFrameworkCoreServiceCollectionExtensions
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static class VidyanoSqlServerServiceCollectionExtensions
     {
-        public static IServiceCollection AddVidyanoEntityFrameworkCore(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddVidyanoSqlServer(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddVidyanoDefaults(configuration);
 
@@ -27,7 +30,7 @@ namespace Vidyano.Service.EntityFrameworkCore
             services.AddScoped<Repository.DataLayer.IRepositorySettingStore>(provider => provider.GetRequiredService<DefaultRepositoryProvider>());
             services.AddScoped<Repository.DataLayer.IRepositoryUserStore, DefaultRepositoryUserStore>();
             services.AddScoped<Repository.DataLayer.IRepositoryUserNotificationStore, DefaultRepositoryUserNotificationStore>();
-            
+
             return services;
         }
     }

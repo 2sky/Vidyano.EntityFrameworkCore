@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using Vidyano.Service.Repository;
 
@@ -23,8 +22,9 @@ namespace Vidyano.Service
 
         /// <inheritdoc />
         public virtual void MarkForDeletion<TEntity>(TEntity entity)
+            where TEntity : notnull
         {
-            Remove(entity ?? throw new ArgumentNullException(nameof(entity)));
+            Remove(entity);
         }
 
         /// <summary>

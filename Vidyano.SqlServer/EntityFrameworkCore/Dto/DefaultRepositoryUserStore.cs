@@ -59,7 +59,7 @@ namespace Vidyano.Service.EntityFrameworkCore.Dto
         /// <inheritdoc />
         public override void RemoveUserFromGroup(Guid userId, Guid groupId)
         {
-            context.Database.ExecuteSqlRaw("delete from [Vidyano].[UserGroup] where [Users_Id] = {0} and [Groups_id] = {1}", userId, groupId);
+            context.Database.ExecuteSqlInterpolated(SqlStatements.RemoveUserFromGroup(userId, groupId));
         }
 
         /// <inheritdoc />
