@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Vidyano.PostgreSQL</PackageId>
+    <Version>6.0.20201217.2654-rc1</Version>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <FileVersion>6.0.0.0</FileVersion>
+    <Company>2sky NV</Company>
+    <Authors>2sky NV</Authors>
+    <Description>Vidyano is a full featured development platform with the flexibility for creating small to enterprise scale web applications.</Description>
+    <Copyright>Copyright © 2010-2021 2sky NV</Copyright>
+    <Tags>vidyano service backend EntityFrameworkCore PostgreSQL</Tags>
+    <PackageProjectUrl>https://www.vidyano.com/</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <RootNamespace>Vidyano.Service</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Vidyano.Service" Version="6.0.20201217.2654-rc1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../Vidyano.SqlServer/*.cs" />
+    <Compile Include="../Vidyano.SqlServer/EntityFrameworkCore/**/*.cs">
+      <Link>EntityFrameworkCore\%(RecursiveDir)/%(FileName)%(Extension)</Link>
+    </Compile>
+    <Compile Remove="..\Vidyano.SqlServer\EntityFrameworkCore\SqlStatements.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <CustomToolNamespace>Vidyano.Service.EntityFrameworkCore</CustomToolNamespace>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
